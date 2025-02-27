@@ -10,7 +10,7 @@ export const counterSlice = createSlice({
   initialState,
   reducers: {
     setUser: (state, action) => {
-      console.log('==> setUser ', action.payload);
+      // console.log('==> setUser ', action.payload);
 
       state.user = action.payload;
     },

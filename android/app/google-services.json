@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "914544315700",
+    "project_id": "expensify-e1e5c",
+    "storage_bucket": "expensify-e1e5c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:914544315700:android:f90ff35e17555d2797e961",
+        "android_client_info": {
+          "package_name": "com.expensify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "914544315700-ng3tqntf1li8o39lapvj777o3gsb2k8u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDTZE17f-cH8Qe2NsuBSOcFRiho3sf3d7M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "914544315700-ng3tqntf1li8o39lapvj777o3gsb2k8u.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "914544315700-79p0iho86b66bn87d1d8sam9ambpqok7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "org.reactjs.native.example.Expensify"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

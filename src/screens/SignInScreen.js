@@ -17,17 +17,17 @@ export default function SignInScreen() {
   const [password, setPassword] = useState('');
   const {userLoading} = useSelector(state => state.user);
 
-  const distpatch = useDispatch();
+  const dispatch = useDispatch();
   const navigation = useNavigation();
 
   const handleSignIn = async () => {
     if (email && password) {
       try {
-        distpatch(setUserLoading(true));
+        dispatch(setUserLoading(true));
         await signInWithEmailAndPassword(auth, email, password);
-        distpatch(setUserLoading(false));
+        dispatch(setUserLoading(false));
       } catch (e) {
-        distpatch(setUserLoading(false));
+        dispatch(setUserLoading(false));
         Snackbar.show({
           text: e.message,
           backgroundColor: 'red',

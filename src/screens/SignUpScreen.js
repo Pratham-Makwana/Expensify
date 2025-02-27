@@ -16,7 +16,7 @@ export default function SignUpScreen() {
   const [password, setPassword] = useState('');
   const {userLoading} = useSelector(state => state.user);
 
-  const distpatch = useDispatch();
+  const dispatch = useDispatch();
   const navigation = useNavigation();
   const handleSignIn = async () => {
     if (email && password) {
@@ -24,11 +24,11 @@ export default function SignUpScreen() {
       // navigation.goBack();
       // navigation.navigate('Home');
       try {
-        distpatch(setUserLoading(true));
+        dispatch(setUserLoading(true));
         await createUserWithEmailAndPassword(auth, email, password);
-        distpatch(setUserLoading(false));
+        dispatch(setUserLoading(false));
       } catch (e) {
-        distpatch(setUserLoading(false));
+        dispatch(setUserLoading(false));
         Snackbar.show({
           text: e.message,
           backgroundColor: 'red',

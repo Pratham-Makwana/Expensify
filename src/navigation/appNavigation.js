@@ -12,20 +12,38 @@ import {useDispatch, useSelector} from 'react-redux';
 import {onAuthStateChanged} from 'firebase/auth';
 import {auth} from '../config/firebase';
 import {setUser} from '../redux/slices/user';
+import {useEffect, useState} from 'react';
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigation() {
+  const [currentUser, setCurrentUser] = useState();
   const {user} = useSelector(state => state.user);
-  const distpatch = useDispatch();
-  console.log('==>AppNavigation User ', user);
+  console.log('==> user', user);
+  console.log('==> currentUser', currentUser);
 
-  onAuthStateChanged(auth, user => {
-    // console.log('==> onAuthStateChanged ', user);
-    distpatch(setUser(user));
-  });
+  const dispatch = useDispatch();
 
-  if (user) {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, user => {
+      if (user) {
+        const serializedUser = {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          phoneNumber: user.phoneNumber,
+          photoURL: user.photoURL,
+        };
+        dispatch(setUser(serializedUser));
+        setCurrentUser(serializedUser);
+      } else {
+        dispatch(setUser(null));
+      }
+    });
+    return () => unsubscribe();
+  }, [dispatch]);
+
+  if (currentUser) {
     return (
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Home">

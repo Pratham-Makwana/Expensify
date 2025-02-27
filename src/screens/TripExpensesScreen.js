@@ -7,15 +7,19 @@ import {
   Button,
   Pressable,
 } from 'react-native';
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import ScreenWrapper from '../components/screenWrapper';
 import {colors} from '../theme';
 
 import EmptyList from '../components/emptyList';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 
 import ExpenseCard from '../components/expenseCard';
 import BackButton from '../components/backButton';
+import {getDocs, query, where} from 'firebase/firestore';
+import {expensesRef} from '../config/firebase';
+import Snackbar from 'react-native-snackbar';
+import Loading from '../components/loading';
 const items = [
   {
     id: 1,
@@ -44,8 +48,40 @@ const items = [
 ];
 export default function TripExpensesScreen(props) {
   const {id, place, country} = props.route.params;
+  const [expenses, setExpenses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const isFocused = useIsFocused();
 
-  console.log('==> Props', props.route.params);
+  const fetchExpenses = async () => {
+    try {
+      const q = query(expensesRef, where('tripId', '==', id));
+      const querySnapShot = await getDocs(q);
+      let data = [];
+      querySnapShot.forEach(doc => {
+        // console.log('==>', doc.data(), doc.id);
+        data.push({...doc.data(), id: doc.id});
+      });
+
+      // console.log("==> expenses", data);
+
+      setExpenses(data);
+    } catch (e) {
+      Snackbar.show({
+        text: e.message,
+        backgroundColor: 'red',
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (isFocused) {
+      setLoading(true);
+      fetchExpenses();
+      setLoading(false);
+    }
+  }, [isFocused]);
+
+  // console.log('==> Props', props.route.params);
 
   const navigation = useNavigation();
   return (
@@ -79,23 +115,29 @@ export default function TripExpensesScreen(props) {
             </Text>
             <TouchableOpacity
               className="p-2 px-3 border border-gray-200 bg-white rounded-full"
-              onPress={() => navigation.navigate('AddExpense')}>
+              onPress={() =>
+                navigation.navigate('AddExpense', {id, place, country})
+              }>
               <Text className={`${colors.heading} font-bold text-1xl`}>
                 Add Expenses
               </Text>
             </TouchableOpacity>
           </View>
           <View style={{height: 430}}>
-            <FlatList
-              showsVerticalScrollIndicator={false}
-              ListEmptyComponent={
-                <EmptyList message={"You haven't recorded any expense yet"} />
-              }
-              keyExtractor={item => item.id}
-              data={items}
-              className="mx-3 "
-              renderItem={({item}) => <ExpenseCard item={item} />}
-            />
+            {loading ? (
+              <Loading />
+            ) : (
+              <FlatList
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={
+                  <EmptyList message={"You haven't recorded any expense yet"} />
+                }
+                keyExtractor={item => item.id}
+                data={expenses}
+                className="mx-3 "
+                renderItem={({item}) => <ExpenseCard item={item} />}
+              />
+            )}
           </View>
         </View>
       </View>

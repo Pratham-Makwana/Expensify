@@ -1,14 +1,16 @@
 import {View, Text, TouchableOpacity, Image, FlatList} from 'react-native';
-import React, { useEffect } from 'react';
+import React, {useEffect, useState} from 'react';
 import ScreenWrapper from '../components/screenWrapper';
 import {colors} from '../theme';
 import randomImage from '../assets/images/randomImage';
 import EmptyList from '../components/emptyList';
-import {useNavigation} from '@react-navigation/native';
+import {useIsFocused, useNavigation} from '@react-navigation/native';
 import {signOut} from 'firebase/auth';
 import {auth, tripRef} from '../config/firebase';
 import {useSelector} from 'react-redux';
-import {getDoc, query, where} from 'firebase/firestore';
+import {getDocs, query, where} from 'firebase/firestore';
+import Snackbar from 'react-native-snackbar';
+
 const items = [
   {
     id: 1,
@@ -42,22 +44,39 @@ const items = [
   },
 ];
 export default function HomeScreen() {
+  const [trips, setTrips] = useState([]);
+  const [randomImg, setRandomImg] = useState(null);
   const navigation = useNavigation();
 
   const {user} = useSelector(state => state.user);
 
+  const isFocused = useIsFocused();
+
   const fetchTrips = async () => {
-    const q = query(tripRef, where('userId', '==', user.uid));
-    console.log('==> query', q);
-    const querySnapShot = await getDoc(q);
-    querySnapShot.forEach(doc => {
-      console.log('==> Doc', doc.data());
-    });
+    try {
+      const q = query(tripRef, where('userId', '==', user.uid));
+
+      const querySnapShot = await getDocs(q);
+      // console.log('==> querySnapShot', querySnapShot);
+      let data = [];
+      querySnapShot.forEach(doc => {
+        // console.log('==> Doc', doc.data(), doc.id);
+        data.push({...doc.data(), id: doc.id});
+      });
+      setTrips(data);
+      // console.log("==> data", data);
+    } catch (e) {
+      Snackbar.show({
+        text: e.message,
+        backgroundColor: 'red',
+      });
+    }
   };
 
   useEffect(() => {
-    fetchTrips()
-  },[])
+    if (isFocused) fetchTrips();
+  }, [isFocused]);
+
   const handleLogout = async () => {
     await signOut(auth);
   };
@@ -102,7 +121,7 @@ export default function HomeScreen() {
               <EmptyList message={"You haven't recorded any trips yet"} />
             }
             keyExtractor={item => item.id}
-            data={items}
+            data={trips}
             columnWrapperStyle={{
               justifyContent: 'space-between',
             }}
